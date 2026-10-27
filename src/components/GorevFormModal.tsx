@@ -10,6 +10,7 @@ import type { YeniGorevGirdisi } from "@/lib/store";
 
 interface GorevFormModalProps {
   acik: boolean;
+  anahtar?: number;
   dersler: Ders[];
   duzenlenecekGorev?: Gorev | null;
   onKaydet: (girdi: YeniGorevGirdisi) => void;
@@ -47,6 +48,7 @@ function GorevFormIcerik({
   const sonTarihHataId = useId();
   const tahminiSaatHataId = useId();
 
+  // Her açılışta temiz varsayılanlar: tür Ödev, son tarih bugün+3, süre 3 saat, başlık ve açıklama boş
   const [dersId, setDersId] = useState(
     duzenlenecekGorev?.dersId ?? (dersler.length > 0 ? dersler[0].id : "")
   );
@@ -331,6 +333,7 @@ function GorevFormIcerik({
 
 export function GorevFormModal({
   acik,
+  anahtar = 0,
   dersler,
   duzenlenecekGorev,
   onKaydet,
@@ -356,7 +359,7 @@ export function GorevFormModal({
 
   if (!acik) return null;
 
-  // Hiç ders yoksa yönlendirme görünümü
+  // Hiç ders yokken açılırsa rehberlik ve yönlendirme görünümü
   if (dersler.length === 0) {
     return (
       <div
@@ -377,11 +380,11 @@ export function GorevFormModal({
           </div>
 
           <h2 id="ders-yok-baslik" className="text-xl font-bold text-main">
-            Önce Bir Ders Eklemelisiniz
+            Önce Bir Ders Eklemelisin
           </h2>
 
           <p className="text-sm text-muted">
-            Görev veya sınav tanımlayabilmek için sisteme kayıtlı en az bir dersiniz olmalıdır.
+            Görev eklemek için önce bir ders eklemelisin.
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -420,7 +423,7 @@ export function GorevFormModal({
       />
 
       <GorevFormIcerik
-        key={duzenlenecekGorev ? duzenlenecekGorev.id : "yeni-gorev"}
+        key={duzenlenecekGorev ? `duzenle-${duzenlenecekGorev.id}-${anahtar}` : `yeni-gorev-${anahtar}`}
         dersler={dersler}
         duzenlenecekGorev={duzenlenecekGorev}
         onKaydet={onKaydet}

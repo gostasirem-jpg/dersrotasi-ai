@@ -8,6 +8,7 @@ import type { YeniDersGirdisi } from "@/lib/store";
 
 interface DersFormModalProps {
   acik: boolean;
+  anahtar?: number;
   duzenlenecekDers?: Ders | null;
   onKaydet: (girdi: YeniDersGirdisi) => void;
   onKapat: () => void;
@@ -250,6 +251,7 @@ function DersFormIcerik({ duzenlenecekDers, onKaydet, onKapat }: DersFormIcerikP
 
 export function DersFormModal({
   acik,
+  anahtar = 0,
   duzenlenecekDers,
   onKaydet,
   onKapat,
@@ -289,7 +291,7 @@ export function DersFormModal({
       />
 
       <DersFormIcerik
-        key={duzenlenecekDers ? duzenlenecekDers.id : "yeni-ders"}
+        key={duzenlenecekDers ? `duzenle-${duzenlenecekDers.id}-${anahtar}` : `yeni-ders-${anahtar}`}
         duzenlenecekDers={duzenlenecekDers}
         onKaydet={onKaydet}
         onKapat={onKapat}
