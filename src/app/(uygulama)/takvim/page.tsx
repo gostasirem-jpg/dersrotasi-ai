@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Takvim",
-  description: "Akademik takviminizi, haftalık ders saatlerinizi ve vize/final sınav programınızı görüntüleyin.",
+  description: "Sınav, ödev ve çalışma bloklarınızı tarihe göre görüntüleyin.",
 };
 
 export default function TakvimPage() {
@@ -13,7 +13,7 @@ export default function TakvimPage() {
           Takvim
         </h1>
         <p className="mt-2 text-sm sm:text-base text-muted">
-          Haftalık ders saatleriniz, vize/final tarihleri ve önemli akademik etkinlikler takvim görünümünde sunulur.
+          Sınav, ödev ve çalışma bloklarınızı takvim görünümünde tarihe göre takip edebilirsiniz.
         </p>
       </div>
 

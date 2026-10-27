@@ -28,7 +28,7 @@ export const ALL_NAV_ITEMS: NavItemConfig[] = [
     name: "Dersler",
     href: "/dersler",
     icon: BookOpen,
-    description: "Kayıtlı dersleriniz, ders programı ve ders materyalleri.",
+    description: "Derslerini ve zorluk seviyelerini yönet.",
   },
   {
     name: "Görevler",
@@ -40,13 +40,13 @@ export const ALL_NAV_ITEMS: NavItemConfig[] = [
     name: "Takvim",
     href: "/takvim",
     icon: Calendar,
-    description: "Akademik takvim, sınav tarihleri ve etkinlik programı.",
+    description: "Sınav, ödev ve çalışma bloklarını tarihe göre gör.",
   },
   {
     name: "Plan",
     href: "/plan",
     icon: Compass,
-    description: "Yapay zeka ile kişiselleştirilmiş akıllı çalışma planı.",
+    description: "Öncelik algoritması ile kişiselleştirilmiş akıllı çalışma planı.",
   },
   {
     name: "Asistan",
@@ -58,7 +58,7 @@ export const ALL_NAV_ITEMS: NavItemConfig[] = [
     name: "İstatistikler",
     href: "/istatistikler",
     icon: BarChart3,
-    description: "Çalışma süreleri, tamamlama oranları ve akademik gelişim.",
+    description: "Çalışma süresi ve tamamlanan görevler.",
   },
 ];
 

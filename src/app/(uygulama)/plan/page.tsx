@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Çalışma Planı",
-  description: "Yapay zeka tarafından hazırlanan kişiselleştirilmiş haftalık ve dönemlik çalışma planı.",
+  description: "Öncelik algoritması ile hazırlanan kişiselleştirilmiş haftalık ve dönemlik çalışma planı.",
 };
 
 export default function PlanPage() {
@@ -13,7 +13,7 @@ export default function PlanPage() {
           Çalışma Planı
         </h1>
         <p className="mt-2 text-sm sm:text-base text-muted">
-          Yapay zeka algoritması derslerinizin zorluk seviyesine ve sınav takviminize göre en ideal çalışma rotasını çıkarır.
+          Öncelik algoritması (kural tabanlı) derslerinizin zorluk seviyesine ve sınav takviminize göre en ideal çalışma rotasını çıkarır.
         </p>
       </div>
 
