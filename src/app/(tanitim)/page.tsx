@@ -4,9 +4,9 @@ import { Compass, ArrowRight } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "DersRotası AI - Üniversite Öğrencileri İçin Akıllı Ders Planlayıcısı",
-  description:
-    "Üniversite öğrencileri için yapay zeka destekli akıllı ders, ödev, sınav ve çalışma planlayıcısı.",
+  title: { absolute: "DersRotası AI - Üniversite Öğrencileri İçin Akıllı Ders Planlayıcısı" }, 
+   description:
+    "Üniversite öğrencileri için derslerini, ödevlerini ve sınavlarını önceliklendirip günlük çalışma planı oluşturan akıllı ders planlayıcısı.",
 };
 
 export default function TanitimPage() {
@@ -40,7 +40,7 @@ export default function TanitimPage() {
               DersRotası AI
             </h1>
             <p className="text-base sm:text-lg text-muted max-w-md mx-auto leading-relaxed">
-              Üniversite öğrencileri için yapay zeka destekli akıllı ders, ödev ve sınav çalışma planlayıcısı.
+              Üniversite öğrencileri için derslerini, ödevlerini ve sınavlarını önceliklendirip günlük çalışma planı oluşturan akıllı ders planlayıcısı.
             </p>
           </div>
 

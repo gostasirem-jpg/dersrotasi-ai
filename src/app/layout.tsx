@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: "%s | DersRotası AI",
   },
   description:
-    "Üniversite öğrencileri için yapay zeka destekli akıllı ders, ödev, sınav ve çalışma planlayıcısı.",
+    "Üniversite öğrencileri için derslerini, ödevlerini ve sınavlarını önceliklendirip günlük çalışma planı oluşturan akıllı ders planlayıcısı.",
 };
 
 // Sayfa ilk yüklenirken temanın (açık/koyu) parlamasını önlemek için head içine enjekte edilen inline script
