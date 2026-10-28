@@ -4,7 +4,7 @@
 
 > YZO 205 Operasyonel Yapay Zekâ dersi — Assignment 1 kapsamında geliştirilmiştir.
 
-**Canlı site:** Vercel yayınından sonra eklenecek.
+**Canlı site:** https://dersrotasi-ai.vercel.app
 
 ## Amaç
 
