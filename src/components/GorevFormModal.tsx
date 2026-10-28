@@ -112,7 +112,7 @@ function GorevFormIcerik({
       {/* Üst Başlık ve Kapat Butonu */}
       <div className="flex items-center justify-between pb-4 border-b border-border mb-5">
         <h2 id="gorev-modal-baslik" className="text-xl font-bold text-main">
-          {duzenlenecekGorev ? "Görevi Düzenle" : "Yeni Görev Ekle"}
+          {duzenlenecekGorev ? "Görevi düzenle" : "Yeni görev ekle"}
         </h2>
         <button
           type="button"
@@ -131,7 +131,7 @@ function GorevFormIcerik({
             htmlFor={dersIdInputId}
             className="block text-sm font-semibold text-main mb-1.5"
           >
-            İlgili Ders <span className="text-danger">*</span>
+            İlgili ders <span className="text-danger">*</span>
           </label>
           <select
             id={dersIdInputId}
@@ -164,7 +164,7 @@ function GorevFormIcerik({
             htmlFor={baslikInputId}
             className="block text-sm font-semibold text-main mb-1.5"
           >
-            Görev Başlığı <span className="text-danger">*</span>
+            Görev başlığı <span className="text-danger">*</span>
           </label>
           <input
             id={baslikInputId}
@@ -195,7 +195,7 @@ function GorevFormIcerik({
         {/* Görev Türü Seçimi */}
         <div>
           <span id="gorev-turu-etiket" className="block text-sm font-semibold text-main mb-2">
-            Görev Türü
+            Görev türü
           </span>
           <div
             role="radiogroup"
@@ -231,7 +231,7 @@ function GorevFormIcerik({
               htmlFor={sonTarihInputId}
               className="block text-sm font-semibold text-main mb-1.5"
             >
-              Son Tarih / Sınav Tarihi <span className="text-danger">*</span>
+              Son tarih / sınav tarihi <span className="text-danger">*</span>
             </label>
             <input
               id={sonTarihInputId}
@@ -262,7 +262,7 @@ function GorevFormIcerik({
               htmlFor={tahminiSaatInputId}
               className="block text-sm font-semibold text-main mb-1.5"
             >
-              Tahmini Süre (Saat) <span className="text-danger">*</span>
+              Tahmini süre (saat) <span className="text-danger">*</span>
             </label>
             <input
               id={tahminiSaatInputId}
@@ -323,7 +323,7 @@ function GorevFormIcerik({
             type="submit"
             className="w-full sm:w-auto inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 rounded-xl bg-accent text-accent-foreground font-semibold shadow-sm hover:bg-accent-hover active:scale-[0.99] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
-            {duzenlenecekGorev ? "Değişiklikleri Kaydet" : "Görevi Ekle"}
+            {duzenlenecekGorev ? "Değişiklikleri kaydet" : "Görevi ekle"}
           </button>
         </div>
       </form>
@@ -380,7 +380,7 @@ export function GorevFormModal({
           </div>
 
           <h2 id="ders-yok-baslik" className="text-xl font-bold text-main">
-            Önce Bir Ders Eklemelisin
+            Önce bir ders eklemelisin
           </h2>
 
           <p className="text-sm text-muted">
@@ -400,7 +400,7 @@ export function GorevFormModal({
               onClick={onKapat}
               className="w-full sm:w-auto inline-flex items-center justify-center min-h-[44px] px-5 py-2.5 rounded-xl bg-accent text-accent-foreground font-semibold text-sm shadow-sm hover:bg-accent-hover"
             >
-              <span>Dersler Sayfasına Git</span>
+              <span>Dersler sayfasına git</span>
               <ArrowRight className="w-4 h-4 ml-1.5" aria-hidden="true" />
             </Link>
           </div>

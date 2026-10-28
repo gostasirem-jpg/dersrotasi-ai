@@ -97,7 +97,7 @@ export function DerslerIstemci() {
               className="inline-flex items-center justify-center min-h-[44px] px-3.5 py-2 rounded-xl border border-border bg-surface text-xs font-semibold text-muted hover:text-danger hover:border-danger/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
             >
               <Trash2 className="w-4 h-4 mr-1.5" aria-hidden="true" />
-              Tümünü Temizle
+              Tümünü temizle
             </button>
           )}
 
@@ -107,7 +107,7 @@ export function DerslerIstemci() {
             className="inline-flex items-center justify-center min-h-[44px] px-5 py-2.5 rounded-xl bg-accent text-accent-foreground font-semibold text-sm shadow-sm hover:bg-accent-hover active:scale-[0.99] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
             <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
-            <span>Ders Ekle</span>
+            <span>Ders ekle</span>
           </button>
         </div>
       </div>
@@ -121,7 +121,7 @@ export function DerslerIstemci() {
         >
           <div className="flex items-center gap-2.5">
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-primary text-primary-foreground">
-              Örnek Veri Seti
+              Örnek veri seti
             </span>
             <p className="text-xs sm:text-sm text-muted">
               Şu an görüntülenen dersler tanıtım amaçlı oluşturulmuş örnek verilerdir.
@@ -134,7 +134,7 @@ export function DerslerIstemci() {
               onClick={() => ornekVerileriYukle()}
               className="inline-flex items-center font-semibold text-primary hover:underline min-h-[44px] px-2"
             >
-              Örnekleri Yenile
+              Örnekleri yenile
             </button>
           </div>
         </div>
@@ -163,7 +163,7 @@ export function DerslerIstemci() {
               className="w-full sm:w-auto inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 rounded-xl bg-accent text-accent-foreground font-semibold text-sm shadow-sm hover:bg-accent-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
-              İlk Dersini Ekle
+              İlk dersini ekle
             </button>
 
             <button
@@ -172,7 +172,7 @@ export function DerslerIstemci() {
               className="w-full sm:w-auto inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 rounded-xl border border-border bg-surface text-main font-semibold text-sm hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary dark:focus-visible:ring-accent"
             >
               <Sparkles className="w-4 h-4 mr-2 text-primary" aria-hidden="true" />
-              Örnek Verileri Yükle
+              Örnek verileri yükle
             </button>
           </div>
         </div>
@@ -202,13 +202,13 @@ export function DerslerIstemci() {
       {/* Tekil Ders Silme Onay Modalı */}
       <OnayModali
         acik={Boolean(silinecekDers)}
-        baslik="Dersi Sil"
+        baslik="Dersi sil"
         mesaj={
           silinecekDers
             ? `"${silinecekDers.ders.ad}" dersi ve bu derse ait ${silinecekDers.bagliGorevSayisi} adet görev kalıcı olarak silinecektir. Devam etmek istiyor musunuz?`
             : ""
         }
-        onayButonMetni="Evet, Dersi Sil"
+        onayButonMetni="Evet, dersi sil"
         iptalButonMetni="Vazgeç"
         tehlikeliMi={true}
         onOnay={handleSilOnayla}
@@ -218,9 +218,9 @@ export function DerslerIstemci() {
       {/* Tüm Verileri Sıfırlama Onay Modalı */}
       <OnayModali
         acik={tumunuSilOnayAcik}
-        baslik="Tüm Verileri Temizle"
+        baslik="Tüm verileri temizle"
         mesaj="Kayıtlı tüm dersleriniz, ödev ve sınav görevleriniz sıfırlanacaktır. Bu işlem geri alınamaz."
-        onayButonMetni="Tüm Verileri Sil"
+        onayButonMetni="Tüm verileri sil"
         iptalButonMetni="Vazgeç"
         tehlikeliMi={true}
         onOnay={() => {

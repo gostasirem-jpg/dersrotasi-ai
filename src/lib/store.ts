@@ -5,11 +5,15 @@ import type {
   VeriDurumu,
   Ders,
   Gorev,
+  Ayarlar,
+  CalismaOturumu,
   ZorlukDerecesi,
   GorevTuru,
 } from "./types";
 import { VARSAYILAN_VERI } from "./types";
 import { ornekVeriUret } from "./ornek-veri";
+import { planOlusturSaf, type PlanlayiciSonucu } from "./planlayici";
+import { yerelTarihDizgisi } from "./tarih";
 
 export const STORAGE_KEY = "dersrotasi-veri";
 
@@ -276,6 +280,147 @@ export function tumVerileriSil(): void {
 }
 
 // -------------------------------------------------------------
+// ÇALIŞMA PLANI VE AYAR EYLEMLERİ
+// -------------------------------------------------------------
+
+export function ayarlariGuncelle(yeniAyarlar: Partial<Ayarlar>): void {
+  const guncel = getSnapshot();
+  veriKaydet({
+    ...guncel,
+    ayarlar: {
+      ...guncel.ayarlar,
+      ...yeniAyarlar,
+    },
+  });
+}
+
+/**
+ * 7 günlük akıllı plan oluşturur:
+ * Bugün ve sonrasındaki TAMAMLANMAMIŞ blokları silip yenilerini ekler;
+ * tamamlanmış bloklar ve geçmiş günler korunur.
+ */
+export function planOlustur(bugununTarihi?: string): PlanlayiciSonucu {
+  const guncel = getSnapshot();
+  const bugunStr = bugununTarihi || yerelTarihDizgisi(new Date(), 0);
+
+  // Korunan bloklar: tamamlanmış olanlar VEYA geçmiş günlere ait olanlar
+  const korunanBloklar = guncel.planBloklari.filter(
+    (b) => b.tamamlandi || b.tarih < bugunStr
+  );
+
+  const planSonucu = planOlusturSaf({
+    gorevler: guncel.gorevler,
+    dersler: guncel.dersler,
+    ayarlar: guncel.ayarlar,
+    mevcutPlanBloklari: guncel.planBloklari,
+    bugununTarihi: bugunStr,
+  });
+
+  veriKaydet({
+    ...guncel,
+    planBloklari: [...korunanBloklar, ...planSonucu.yeniBloklar],
+  });
+
+  return planSonucu;
+}
+
+/**
+ * Plan bloğunu günceller (dakika veya tarih değiştirme).
+ */
+export function blokGuncelle(id: string, girdi: { dakika?: number; tarih?: string }): void {
+  const guncel = getSnapshot();
+  const yeniPlanBloklari = guncel.planBloklari.map((blok) => {
+    if (blok.id !== id) return blok;
+    return {
+      ...blok,
+      dakika:
+        girdi.dakika !== undefined
+          ? Math.max(5, Math.min(120, girdi.dakika))
+          : blok.dakika,
+      tarih: girdi.tarih !== undefined ? girdi.tarih : blok.tarih,
+    };
+  });
+
+  // Eğer blok daha önce tamamlanmışsa ve süresi/tarihi değiştiyse ilişkili oturumu da güncelle
+  const yeniOturumlar = guncel.oturumlar.map((oturum) => {
+    if (oturum.id !== `oturum-blok-${id}`) return oturum;
+    return {
+      ...oturum,
+      dakika:
+        girdi.dakika !== undefined
+          ? Math.max(5, Math.min(120, girdi.dakika))
+          : oturum.dakika,
+      tarih: girdi.tarih !== undefined ? girdi.tarih : oturum.tarih,
+    };
+  });
+
+  veriKaydet({
+    ...guncel,
+    planBloklari: yeniPlanBloklari,
+    oturumlar: yeniOturumlar,
+  });
+}
+
+/**
+ * Plan bloğunu siler ve ilişkili çalışma oturumu varsa onu da kaldırır.
+ */
+export function blokSil(id: string): void {
+  const guncel = getSnapshot();
+  veriKaydet({
+    ...guncel,
+    planBloklari: guncel.planBloklari.filter((b) => b.id !== id),
+    oturumlar: guncel.oturumlar.filter((o) => o.id !== `oturum-blok-${id}`),
+  });
+}
+
+/**
+ * Bloğu tamamlandı yapar ve aynı dakikayla bir CalismaOturumu kaydı ekler.
+ */
+export function blokTamamla(id: string): void {
+  const guncel = getSnapshot();
+  const hedefBlok = guncel.planBloklari.find((b) => b.id === id);
+  if (!hedefBlok || hedefBlok.tamamlandi) return;
+
+  const yeniPlanBloklari = guncel.planBloklari.map((b) =>
+    b.id === id ? { ...b, tamamlandi: true } : b
+  );
+
+  const yeniOturum: CalismaOturumu = {
+    id: `oturum-blok-${id}`,
+    dersId: hedefBlok.dersId,
+    tarih: hedefBlok.tarih,
+    dakika: hedefBlok.dakika,
+  };
+
+  // Varsa eskisi çıkarılır, yenisi eklenir
+  const filtrelenmisOturumlar = guncel.oturumlar.filter(
+    (o) => o.id !== `oturum-blok-${id}`
+  );
+
+  veriKaydet({
+    ...guncel,
+    planBloklari: yeniPlanBloklari,
+    oturumlar: [...filtrelenmisOturumlar, yeniOturum],
+  });
+}
+
+/**
+ * Blok tamamlamayı geri alır (bloğu tamamlanmadı yapar ve oturum kaydını da siler).
+ */
+export function blokTamamlamayiGeriAl(id: string): void {
+  const guncel = getSnapshot();
+  const yeniPlanBloklari = guncel.planBloklari.map((b) =>
+    b.id === id ? { ...b, tamamlandi: false } : b
+  );
+
+  veriKaydet({
+    ...guncel,
+    planBloklari: yeniPlanBloklari,
+    oturumlar: guncel.oturumlar.filter((o) => o.id !== `oturum-blok-${id}`),
+  });
+}
+
+// -------------------------------------------------------------
 // REACT HOOK
 // -------------------------------------------------------------
 
@@ -303,6 +448,8 @@ export function useVeriDeposu() {
     dersler: veri.dersler,
     gorevler: veri.gorevler,
     ayarlar: veri.ayarlar,
+    planBloklari: veri.planBloklari,
+    oturumlar: veri.oturumlar,
     // Eylemler
     dersEkle,
     dersGuncelle,
@@ -313,5 +460,11 @@ export function useVeriDeposu() {
     gorevTamamlandiDegistir,
     ornekVerileriYukle,
     tumVerileriSil,
+    ayarlariGuncelle,
+    planOlustur,
+    blokGuncelle,
+    blokSil,
+    blokTamamla,
+    blokTamamlamayiGeriAl,
   };
 }

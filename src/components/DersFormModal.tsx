@@ -75,7 +75,7 @@ function DersFormIcerik({ duzenlenecekDers, onKaydet, onKapat }: DersFormIcerikP
       {/* Başlık ve Kapat Butonu */}
       <div className="flex items-center justify-between pb-4 border-b border-border mb-6">
         <h2 id="ders-modal-baslik" className="text-xl font-bold text-main">
-          {duzenlenecekDers ? "Dersi Düzenle" : "Yeni Ders Ekle"}
+          {duzenlenecekDers ? "Dersi düzenle" : "Yeni ders ekle"}
         </h2>
         <button
           type="button"
@@ -94,7 +94,7 @@ function DersFormIcerik({ duzenlenecekDers, onKaydet, onKapat }: DersFormIcerikP
             htmlFor={adInputId}
             className="block text-sm font-semibold text-main mb-1.5"
           >
-            Ders Adı <span className="text-danger">*</span>
+            Ders adı <span className="text-danger">*</span>
           </label>
           <input
             id={adInputId}
@@ -128,7 +128,7 @@ function DersFormIcerik({ duzenlenecekDers, onKaydet, onKapat }: DersFormIcerikP
             htmlFor={kodInputId}
             className="block text-sm font-semibold text-main mb-1.5"
           >
-            Ders Kodu <span className="text-xs font-normal text-muted">(isteğe bağlı)</span>
+            Ders kodu <span className="text-xs font-normal text-muted">(isteğe bağlı)</span>
           </label>
           <input
             id={kodInputId}
@@ -147,7 +147,7 @@ function DersFormIcerik({ duzenlenecekDers, onKaydet, onKapat }: DersFormIcerikP
             id="zorluk-etiket"
             className="block text-sm font-semibold text-main mb-2"
           >
-            Zorluk Seviyesi <span className="text-danger">*</span>
+            Zorluk seviyesi <span className="text-danger">*</span>
           </span>
 
           <div
@@ -197,7 +197,7 @@ function DersFormIcerik({ duzenlenecekDers, onKaydet, onKapat }: DersFormIcerikP
             id="renk-etiket"
             className="block text-sm font-semibold text-main mb-2"
           >
-            Ders Rengi
+            Ders rengi
           </span>
           <div
             role="radiogroup"
@@ -241,7 +241,7 @@ function DersFormIcerik({ duzenlenecekDers, onKaydet, onKapat }: DersFormIcerikP
             type="submit"
             className="w-full sm:w-auto inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 rounded-xl bg-accent text-accent-foreground font-semibold shadow-sm hover:bg-accent-hover active:scale-[0.99] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
-            {duzenlenecekDers ? "Değişiklikleri Kaydet" : "Dersi Ekle"}
+            {duzenlenecekDers ? "Değişiklikleri kaydet" : "Dersi ekle"}
           </button>
         </div>
       </form>

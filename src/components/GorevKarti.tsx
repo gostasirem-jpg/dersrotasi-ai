@@ -202,7 +202,7 @@ export function GorevKarti({
             </span>
           ) : bugun ? (
             <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-warning/15 text-warning border border-warning/30">
-              Bugün Son Gün
+              Bugün son gün
             </span>
           ) : (
             <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-surface-hover text-text-muted">

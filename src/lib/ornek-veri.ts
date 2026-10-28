@@ -67,7 +67,7 @@ export function ornekVeriUret(): VeriDurumu {
     {
       id: "ornek-gorev-odev-python",
       dersId: "ornek-ders-python",
-      baslik: "Veri Yapıları & Nesne Yönelimli Kodlama",
+      baslik: "Veri Yapıları ve Nesne Yönelimli Kodlama",
       tur: "odev",
       sonTarih: yerelTarihDizgisi(bugun, 7), // 7 gün sonra
       tahminiSaat: 4,
