@@ -14,14 +14,18 @@
  * 3. Günlük Görev Uygunluğu ve Öncelik Dağıtımı:
  *    - Bir görev, son teslim/sınav tarihinden sonraki günlere planlanamaz.
  *    - Gecikmiş görevler yalnızca bugüne (1. gün) planlanabilir.
- *    - Her çalışma gününde kullanılabilir dakika = gunlukSaat * 60 olarak hesaplanır.
+ *    - Her çalışma gününde kullanılabilir dakika = max(0, gunlukSaat * 60 - o gün TAMAMLANMIŞ blokların toplam dakikası).
+ *    - Görevsiz tamamlanmış bloklar da günlük kapasiteden düşülür; kalan kapasite 5'in katına aşağı yuvarlanır.
  *    - O gün için uygun görevlerin öncelik puanları toplanır ve dakikalar puanlarla ORANTILI olarak dağıtılır.
- *    - Hiçbir göreve kalan ihtiyacından fazla süre verilmez.
- *    - Yuvarlamadan kalan artık dakikalar en yüksek öncelikli uygun göreve aktarılır.
+ *    - Kalan toplam ihtiyacı en az 25 dakika olan görevlerin 25 dakikadan küçük günlük payları sıfırlanır.
+ *    - Boşa çıkan ve yuvarlamadan kalan dakikalar, ihtiyacı aşmadan en yüksek öncelikli uygun göreve aktarılır.
+ *    - Yeni bir göreve süre ayrılacaksa en az 25 dakika ayrılır; sığmayan süre sonraki uygun göreve aktarılır.
  *
  * 4. Blok Sürelerinin Düzenlenmesi:
  *    - Blok süreleri 5'in katı, en az 25, en fazla 50 dakika olacak şekilde oluşturulur.
  *    - 50 dakikayı aşan büyük paylar birden fazla 25-50 dk arası bloğa bölünür.
+ *    - İstisna: Kalan toplam ihtiyaç 25 dakikadan azsa, ihtiyaç 5'in katına yukarı yuvarlanarak tek bir son blok verilebilir.
+ *    - Bu son blok bütçeye bütünüyle sığmıyorsa o gün verilmez; günlük kapasite hiçbir durumda aşılmaz.
  *
  * 5. Kapasite Uyarısı Üretimi:
  *    - Bir görevin kalan ihtiyacı son tarihine kadar planlanabilen süreye sığmıyorsa Türkçe kapasite uyarısı üretilir.
@@ -109,10 +113,14 @@ export function planOlusturSaf({
 
   const bugunStr = yerelTarihDizgisi(bugunDate, 0);
 
-  // 1. Görevlerin tamamlanmış blok dakikalarını hesapla
+  // 1. Görev ve tarih bazında tamamlanmış blok dakikalarını hesapla
   const tamamlananDakikaHaritasi = new Map<string, number>();
+  const gunlukTamamlananDakikaHaritasi = new Map<string, number>();
   mevcutPlanBloklari.forEach((blok) => {
-    if (blok.tamamlandi && blok.gorevId) {
+    if (!blok.tamamlandi) return;
+    const gunlukTamamlanan = gunlukTamamlananDakikaHaritasi.get(blok.tarih) || 0;
+    gunlukTamamlananDakikaHaritasi.set(blok.tarih, gunlukTamamlanan + blok.dakika);
+    if (blok.gorevId) {
       const simdiki = tamamlananDakikaHaritasi.get(blok.gorevId) || 0;
       tamamlananDakikaHaritasi.set(blok.gorevId, simdiki + blok.dakika);
     }
@@ -144,7 +152,7 @@ export function planOlusturSaf({
   gorevler.forEach((g) => gorevHaritasi.set(g.id, g));
 
   const yeniBloklar: PlanBlogu[] = [];
-  const gunlukHedefDakika = Math.max(0, Math.round((ayarlar.gunlukSaat || 0) * 60));
+  const gunlukHedefDakika = Math.max(0, (ayarlar.gunlukSaat || 0) * 60);
 
   // 3. 7 günlük takvim döngüsü
   for (let gunIndeks = 0; gunIndeks < 7; gunIndeks++) {
@@ -157,7 +165,12 @@ export function planOlusturSaf({
       continue;
     }
 
-    if (gunlukHedefDakika <= 0) {
+    const tamamlananDakika = gunlukTamamlananDakikaHaritasi.get(oGununTarihi) || 0;
+    const kullanilabilirDakika = Math.max(
+      0,
+      Math.floor((gunlukHedefDakika - tamamlananDakika) / 5) * 5
+    );
+    if (kullanilabilirDakika <= 0) {
       continue;
     }
 
@@ -200,34 +213,39 @@ export function planOlusturSaf({
 
     uygunGorevler.forEach((g) => {
       const puan = oncelikHaritasi.get(g.id) || 1;
-      const hamPay = (puan / (toplamPuan || 1)) * gunlukHedefDakika;
+      const hamPay = (puan / (toplamPuan || 1)) * kullanilabilirDakika;
       const kalanIhtiyac = gorevKalanIhtiyac.get(g.id) || 0;
 
       // İhtiyaçtan fazlasını verme ve 5'in katına yuvarla
       const sinirliPay = Math.min(hamPay, kalanIhtiyac);
-      const pay5 = Math.floor(sinirliPay / 5) * 5;
+      let pay5 = Math.floor(sinirliPay / 5) * 5;
+      if (kalanIhtiyac < 25) {
+        // Son ihtiyacı parçalayıp birden fazla kısa blok oluşturma.
+        const sonBlokDakika = Math.ceil(kalanIhtiyac / 5) * 5;
+        pay5 = hamPay >= sonBlokDakika ? sonBlokDakika : 0;
+      } else if (pay5 < 25) {
+        pay5 = 0;
+      }
 
       gunlukGorevPaylari.set(g.id, pay5);
       toplamDagitilanDk += pay5;
     });
 
-    // Yuvarlamadan kalan dakikaları en yüksek öncelikli uygun görevlere 5'er dk olarak aktar
-    let kalanDakika = gunlukHedefDakika - toplamDagitilanDk;
-    let ilerlemeOldu = true;
+    // Küçük paylardan ve yuvarlamadan artan süreyi önce en yüksek önceliğe aktar.
+    let kalanDakika = kullanilabilirDakika - toplamDagitilanDk;
+    for (const g of uygunGorevler) {
+      if (kalanDakika < 5) break;
+      const oankiPay = gunlukGorevPaylari.get(g.id) || 0;
+      const kalanIhtiyac = gorevKalanIhtiyac.get(g.id) || 0;
+      const ihtiyac5 = kalanIhtiyac < 25
+        ? Math.ceil(kalanIhtiyac / 5) * 5
+        : Math.floor(kalanIhtiyac / 5) * 5;
+      const ekDakika = Math.min(kalanDakika, ihtiyac5 - oankiPay);
+      const enAzPay = kalanIhtiyac < 25 ? ihtiyac5 : 25;
 
-    while (kalanDakika >= 5 && ilerlemeOldu) {
-      ilerlemeOldu = false;
-      for (const g of uygunGorevler) {
-        if (kalanDakika < 5) break;
-        const oankiPay = gunlukGorevPaylari.get(g.id) || 0;
-        const kalanIhtiyac = gorevKalanIhtiyac.get(g.id) || 0;
-
-        if (oankiPay + 5 <= kalanIhtiyac) {
-          gunlukGorevPaylari.set(g.id, oankiPay + 5);
-          kalanDakika -= 5;
-          ilerlemeOldu = true;
-        }
-      }
+      if (ekDakika <= 0 || oankiPay + ekDakika < enAzPay) continue;
+      gunlukGorevPaylari.set(g.id, oankiPay + ekDakika);
+      kalanDakika -= ekDakika;
     }
 
     // Her görev için ayrılan süreyi 25-50 dk'lık bloklara böl ve listeye ekle
