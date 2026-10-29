@@ -44,85 +44,82 @@ const GOREV_TURU_RENKLERI: Record<string, string> = {
   quiz: "#f59e0b",
 };
 
-/** SVG Sütun Grafiği (grafik kütüphanesi kullanılmaz) */
+/**
+ * HTML + Tailwind sütun grafiği (SVG viewBox ölçekleme sorunu olmaz).
+ * Grafik yüksekliği: mobilde 180px, masaüstünde 220px (Tailwind ile).
+ */
 function HaftalikGrafik({
   gunler,
 }: {
   gunler: Array<{ tarih: string; kisaAd: string; dakika: number; bugunMu: boolean }>;
 }) {
   const maxDakika = Math.max(...gunler.map((g) => g.dakika), 1);
-  const SVG_YUKSEKLIK = 120;
-  const CUBUK_BOSLUGU = 4;
-  const ETIKET_YUKSEKLIGI = 20;
-  const grafYuksekligi = SVG_YUKSEKLIK - ETIKET_YUKSEKLIGI;
-
   const toplamDakika = gunler.reduce((s, g) => s + g.dakika, 0);
 
   return (
-    <div className="space-y-2">
-      {/* Görsel grafik */}
+    <div
+      className="space-y-1"
+      aria-label={`Son 7 günlük çalışma süresi grafiği. Toplam: ${sureMetni(toplamDakika)}`}
+    >
+      {/* Grafik alanı: sütunlar + değer etiketleri */}
       <div
-        aria-label={`Son 7 günlük çalışma süresi grafiği. Toplam: ${sureMetni(toplamDakika)}`}
-        className="w-full"
+        className="flex items-end gap-1.5 h-[180px] sm:h-[220px] w-full"
+        aria-hidden="true"
       >
-        <svg
-          viewBox={`0 0 ${gunler.length * (40 + CUBUK_BOSLUGU)} ${SVG_YUKSEKLIK + 24}`}
-          className="w-full"
-          aria-hidden="true"
-          focusable="false"
-        >
-          {gunler.map((gun, i) => {
-            const cubukGenisligi = 40;
-            const x = i * (cubukGenisligi + CUBUK_BOSLUGU);
-            const yuzde = gun.dakika / maxDakika;
-            const cubukYuksekligi = Math.max(yuzde * grafYuksekligi, gun.dakika > 0 ? 4 : 0);
-            const cubukY = grafYuksekligi - cubukYuksekligi;
-            const renk = gun.bugunMu
-              ? "var(--color-accent, #3b82f6)"
-              : "var(--color-border, #e5e7eb)";
-            const metin = gun.dakika > 0 ? (gun.dakika < 60 ? `${gun.dakika}dk` : `${Math.round(gun.dakika / 60)}sa`) : "";
+        {gunler.map((gun) => {
+          const oranYuzde = (gun.dakika / maxDakika) * 100;
+          // Veri varsa minimum görünür yükseklik 4px
+          const cubukYuzde = gun.dakika > 0 ? Math.max(oranYuzde, 2) : 0;
+          const etiket =
+            gun.dakika === 0
+              ? ""
+              : gun.dakika < 60
+              ? `${gun.dakika}dk`
+              : `${Math.floor(gun.dakika / 60)}s${gun.dakika % 60 > 0 ? ` ${gun.dakika % 60}dk` : ""}`;
 
-            return (
-              <g key={gun.tarih}>
-                {/* Değer etiketi (sütunun üstü) */}
-                {gun.dakika > 0 && (
-                  <text
-                    x={x + cubukGenisligi / 2}
-                    y={cubukY - 3}
-                    textAnchor="middle"
-                    fontSize="9"
-                    fill="currentColor"
-                    className="text-muted"
-                  >
-                    {metin}
-                  </text>
-                )}
-                {/* Sütun */}
-                <rect
-                  x={x + 2}
-                  y={cubukY}
-                  width={cubukGenisligi - 4}
-                  height={cubukYuksekligi}
-                  rx="4"
-                  fill={renk}
-                  opacity={gun.bugunMu ? 1 : 0.65}
-                />
-                {/* Gün adı */}
-                <text
-                  x={x + cubukGenisligi / 2}
-                  y={grafYuksekligi + ETIKET_YUKSEKLIGI}
-                  textAnchor="middle"
-                  fontSize="10"
-                  fontWeight={gun.bugunMu ? "700" : "500"}
-                  fill="currentColor"
-                  className={gun.bugunMu ? "text-main" : "text-muted"}
-                >
-                  {gun.kisaAd}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
+          return (
+            <div
+              key={gun.tarih}
+              className="flex-1 flex flex-col items-center justify-end h-full gap-0.5"
+            >
+              {/* Dakika değeri etiketi (sütunun hemen üstü) */}
+              <span className="text-[10px] sm:text-xs font-medium text-muted leading-none mb-0.5 h-4 flex items-end justify-center">
+                {etiket}
+              </span>
+
+              {/* Sütun */}
+              <div
+                className="w-full rounded-t-md transition-all duration-500"
+                style={{
+                  height: `${cubukYuzde}%`,
+                  backgroundColor: gun.bugunMu
+                    ? "var(--color-accent, #3b82f6)"
+                    : "var(--color-border, #d1d5db)",
+                  opacity: gun.bugunMu ? 1 : 0.7,
+                  minHeight: gun.dakika > 0 ? "4px" : "0px",
+                }}
+                title={`${gun.kisaAd}: ${gun.dakika > 0 ? sureMetni(gun.dakika) : "Çalışma yok"}`}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Gün etiketleri — grafik alanının dışında, normal HTML metin boyutunda */}
+      <div className="flex gap-1.5" aria-hidden="true">
+        {gunler.map((gun) => (
+          <div key={gun.tarih} className="flex-1 text-center">
+            <span
+              className={`text-xs leading-none ${
+                gun.bugunMu
+                  ? "font-bold text-main"
+                  : "font-medium text-muted"
+              }`}
+            >
+              {gun.kisaAd}
+            </span>
+          </div>
+        ))}
       </div>
 
       {/* Ekran okuyucu için görünmez tablo */}
@@ -139,7 +136,10 @@ function HaftalikGrafik({
           {gunler.map((gun) => (
             <tr key={gun.tarih}>
               <td>{gun.tarih}</td>
-              <td>{gun.kisaAd}{gun.bugunMu ? " (bugün)" : ""}</td>
+              <td>
+                {gun.kisaAd}
+                {gun.bugunMu ? " (bugün)" : ""}
+              </td>
               <td>{gun.dakika > 0 ? sureMetni(gun.dakika) : "Çalışma yok"}</td>
             </tr>
           ))}
