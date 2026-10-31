@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AsistanIstemci } from "@/components/asistan/AsistanIstemci";
 
 export const metadata: Metadata = {
   title: "Yapay Zeka Asistanı",
@@ -13,15 +14,11 @@ export default function AsistanPage() {
           Asistan
         </h1>
         <p className="mt-2 text-sm sm:text-base text-muted">
-          Ders notlarınız, takıldığınız konular veya çalışma stratejileriniz hakkında anında destek alabileceğiniz yapay zeka asistanı.
+          Derslerine, görevlerine ve günlük hedefine göre kısa ve uygulanabilir çalışma önerileri al.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
-        <p className="text-sm text-muted">
-          Asistan sohbet ve soru-cevap arayüzü sonraki aşamada buraya eklenecektir.
-        </p>
-      </div>
+      <AsistanIstemci />
     </div>
   );
 }
