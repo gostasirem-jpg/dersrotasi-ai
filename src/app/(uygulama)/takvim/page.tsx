@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TakvimIstemci } from "@/components/takvim/TakvimIstemci";
 
 export const metadata: Metadata = {
   title: "Takvim",
@@ -17,11 +18,7 @@ export default function TakvimPage() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
-        <p className="text-sm text-muted">
-          İnteraktif haftalık ve aylık takvim görünümü sonraki aşamada buraya eklenecektir.
-        </p>
-      </div>
+      <TakvimIstemci />
     </div>
   );
 }
