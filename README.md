@@ -99,6 +99,7 @@ Planlayıcı kuralları:
 | 3 | `feat: planlayıcıda 25-50 dk blok kuralı ve günlük kapasite kontrolü` | Codex |
 | 4 | `feat: aylık takvim görünümü ve gün detayı` | Codex |
 | 5 | `feat: Gemini destekli çalışma asistanı ve kural tabanlı yedek sistem` | Codex |
+| 6 | `feat: tanıtım sayfasını özellikler, nasıl çalışır ve gizlilik bölümleriyle tamamla` | Codex |
 | — | `fix: tanıtım sayfasındaki yapay zekâ iddiasını ve tekrarlanan başlığı düzelt` | Öğrenci (manuel) |
 
 Her iyileştirme ayrı commit olarak GitHub'a gönderildi ve Vercel'in canlı siteyi otomatik olarak güncellediği doğrulandı.
