@@ -190,3 +190,66 @@ Bir değişiklik canlıya gönderilmeden ve çalışma teslim edilmeden önce a�
 - [ ] `git push origin main` komutu başarıyla tamamlandı.
 - [ ] Vercel Dashboard üzerinde derleme ve dağıtım başarıyla sonuçlandı (Ready / Production).
 - [ ] Canlı Production URL ziyaret edilerek yapılan değişikliğin sorunsuz çalıştığı doğrulandı.
+
+## 10. Gerçek Deneyimden Öğrenilenler
+
+Bu bölüm, DersRotası AI projesinin geliştirilmesi sırasında yaşanan gerçek durumlardan çıkarılan kurallardır.
+
+### 10.1 Agent çıktısını doğrulama
+
+- Agent'ın raporuna değil, aracın çıktısına güven. Her görevden sonra kullanıcı kendisi `npm run lint`, `npm run build` ve `git diff --stat` çalıştırır. (Yaşanan durum: agent "lint: 0 hata" raporladı, gerçekte 1 hata vardı.)
+- Agent arayüzündeki değişiklik özetleri yalnızca son düzenlemeyi gösterebilir. Kesin bilgi `git diff --stat` ile alınır. (Yaşanan durum: kart "+2 -2" gösterdi, gerçek değişiklik +189 -41 idi.)
+- `npm run build` ve `npm run lint` birbirinin yerini tutmaz. Next.js 16'da `next build` lint çalıştırmaz.
+- Bazı hatalar build veya lint ile yakalanmaz, yalnızca gözle kontrol edilir: sayfa başlığı (metadata), metin doğruluğu (örn. kural tabanlı sisteme "yapay zekâ" denmesi), algoritma kurallarına uyum (örn. 25 dakikadan kısa bloklar).
+- Kabul testi: Beklenen sonucu kod yazdırılmadan önce elle hesapla (örn. zorluk 4, 3 gün kalan sınav → 83 puan). Sonuç farklı çıkarsa önce test girdisini kontrol et, sonra koda bak.
+- Agent'ın neyi test etmediğini açıkça söylemesi istenir ("tarayıcıda görsel doğrulama yapılmadı" gibi); söylenmeyen testler kullanıcı tarafından yapılır.
+
+### 10.2 Görev verme
+
+- Görevleri küçük ve tek amaçlı ver. Büyük görevlerde agent işi yarıda bırakabilir veya kota bitebilir.
+- Her görevde yasakları açıkça yaz: yeni paket kurma, git komutu çalıştırma, `.env.local` dosyasını okuma, sahte içerik üretme.
+- Daha önce yaşanan hataları sonraki görevlerde baştan belirt (örn. `useEffect` içinde doğrudan `setState` yasağı).
+- Eksik gereksinim de hata üretir. (Yaşanan durum: "tamamlanan bloklar korunsun" yazıldı ama "o günün kapasitesinden düşülsün" yazılmadı; günlük hedef aşıldı.)
+- Kota bir görevin ortasında biterse yarım değişikliği commit'leme; `git restore <dosya>` ile son commit'e dön.
+- Kota dolarsa ödevin izin verdiği başka bir agent'a geç ve bunu README'de belgele.
+- Tanıtım sayfası gibi içerik görevlerinde içerik kurallarını görevin en başına yaz; agent'lar burada sahte yorum ve sayı üretmeye en yatkındır.
+
+### 10.3 Onay politikası
+
+| Komut türü | Politika |
+|---|---|
+| Okuma (`dir`, `Get-ChildItem`, `Get-Content`, `Select-String`) | Bu projede kalıcı izin verilebilir |
+| `npm run lint`, `npm run build` | Bu projede izin verilebilir |
+| `npm install ...` | Her seferinde sor; görevde izin verilen paket değilse reddet |
+| `git ...` | Reddet; commit ve push kullanıcı tarafından yapılır |
+| Dosya silme | Önce neyin silineceğini incele |
+| `.env.local` erişimi | Reddet |
+
+- Agent'lar onay isteyen modda kullanılır (Antigravity: Request Review, Codex: Ask for approval). "Turbo" veya "Full access" modları kullanılmaz.
+- Agent bir kontrolü 3-4 turdan fazla tekrarlıyorsa durdurulur ve doğrudan yönlendirilir.
+
+### 10.4 Ortam değişkenleri ve gizli anahtarlar
+
+- `.env.local` dosyasının Git tarafından yok sayıldığını doğrula: `git check-ignore -v .env.local` (beklenen: `.gitignore` içindeki `.env*` kuralı).
+- Anahtarı ekrana yazdırmadan doğrula: yalnızca uzunluğunu kontrol et ve anahtarla model listesini iste. İşin bitince değişkeni sil (`Remove-Variable`).
+- Örnek yer tutucu metinleri (örn. `ANAHTARIN`) gerçek değerle değiştirmeyi unutma; anahtar uzunluğu 9 gibi anlamsız bir sayıysa yer tutucu kalmıştır.
+- `.env.local` değiştiğinde geliştirme sunucusunu yeniden başlat (`- Environments: .env.local` satırını kontrol et).
+- Vercel'de ortam değişkenlerini push'tan ÖNCE ekle; böylece yeni deployment değerleri hazır bulur. Aksi halde Redeploy gerekir.
+- Gizli değerler (API anahtarı) "Secret", gizli olmayan ayarlar (model adı) "Config" türünde eklenir.
+- Model zaman aşımına düşerse kodu değiştirmeden `GEMINI_MODEL` ile daha hızlı bir model seçilir (bu projede `gemini-3.5-flash-lite`).
+
+### 10.5 Windows notları
+
+- PowerShell `npm.ps1 cannot be loaded` hatası: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. Agent sandbox'ında `npm.cmd` kullanılabilir.
+- Codex sandbox'ında `next build`, Google Fonts'u indirmek için ağ izni ister; yalnızca o komut için tek seferlik izin verilir.
+- Yolunda parantez olan dosyalar (örn. `src\app\(tanitim)\page.tsx`) PowerShell'de tırnak içinde yazılır.
+- Windows PowerShell 5.1'de Türkçe karakterli UTF-8 dosyalar `Get-Content -Encoding UTF8` ile okunur.
+- Next.js 16'da geliştirme sunucusu ayrı bir klasöre (`.next/dev`) yazdığı için build öncesinde `npm run dev` durdurulmak zorunda değildir.
+- Yeni açılan PowerShell sekmeleri kullanıcı klasöründe başlar; Git komutlarından önce `cd` ile proje klasörüne geçildiği doğrulanır.
+
+### 10.6 Canlı doğrulama
+
+- Değişiklik önce `localhost:3000` üzerinde test edilir; canlı site yalnızca push sonrasında güncellenir.
+- Canlıda doğrularken `Ctrl + Shift + R` ile önbelleksiz yenileme yapılır.
+- LocalStorage verileri adrese özeldir; `localhost` ile `vercel.app` üzerindeki veriler birbirinden ayrıdır.
+- Next.js geliştirme göstergesi (sol alttaki "N") yalnızca `npm run dev` sırasında görünür; canlıda görünmemesi production sürümünün açık olduğunu gösterir.
