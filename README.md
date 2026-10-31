@@ -35,7 +35,7 @@ Bu bilgilerden her göreve bir öncelik puanı verir ve süreyi bu puanlarla ora
 | Panel: bugünkü hedef, yaklaşan görevler, ders ilerlemesi | ✅ |
 | İstatistikler: son 7 gün grafiği, derslere ayrılan zaman, görev türleri | ✅ |
 | Açık / koyu tema, masaüstü ve mobil uyumlu arayüz | ✅ |
-| Takvim görünümü | Planlanıyor |
+| Aylık takvim görünümü ve gün detayı | ✅ |
 | Gemini destekli çalışma asistanı | Planlanıyor |
 
 Paneldeki ve istatistiklerdeki tüm sayılar kullanıcının kendi verilerinden hesaplanır; sabit veya örnek istatistik gösterilmez.
@@ -75,7 +75,7 @@ Planlayıcı kuralları:
 
 - **AI coding agent'lar:**
   - **Google Antigravity** (Gemini 3.8 Flash ve Claude Sonnet 4.6 modelleri, *Request Review* modunda): iskelet, veri katmanı, ders/görev yönetimi, öncelik algoritması, akıllı plan, panel ve istatistikler
-  - **OpenAI Codex** (VS Code eklentisi, GPT-6.1 Sol modeli, *Ask for approval* modunda): planlayıcı blok ve kapasite kuralları. Antigravity'nin ücretsiz kotası dolduğu için ödevde izin verilen ikinci agent'a geçildi.
+  - **OpenAI Codex** (VS Code eklentisi, GPT-6.1 Sol modeli, *Ask for approval* modunda): planlayıcı blok ve kapasite kuralları, takvim görünümü. Antigravity'nin ücretsiz kotası dolduğu için ödevde izin verilen ikinci agent'a geçildi.
 - Her terminal komutu ve dosya değişikliği öğrenci onayıyla çalıştırıldı.
 - **Sürüm kontrolü:** Git ve GitHub CLI
 - **Doğrulama:** Her değişiklikten sonra `npm run lint`, `npm run build` ve tarayıcıda masaüstü/mobil (360, 768, 1280 px) testleri. Agent raporları bağımsız olarak kontrol edildi; agent'ların gözden kaçırdığı hatalar (lint hatası, metadata kaybı, yanlış yapay zekâ iddiaları, blok kuralı ihlali) testlerde yakalanıp düzeltildi.
@@ -89,6 +89,7 @@ Planlayıcı kuralları:
 | 1 | `feat: gerçek verilerle panel ve istatistik ekranları` | Antigravity |
 | 2 | `fix: istatistik grafiğinin ölçeklenmesini düzelt ve sütun değerlerini göster` | Antigravity |
 | 3 | `feat: planlayıcıda 25-50 dk blok kuralı ve günlük kapasite kontrolü` | Codex |
+| 4 | `feat: aylık takvim görünümü ve gün detayı` | Codex |
 | — | `fix: tanıtım sayfasındaki yapay zekâ iddiasını ve tekrarlanan başlığı düzelt` | Öğrenci (manuel) |
 
 Her iyileştirme ayrı commit olarak GitHub'a gönderildi ve Vercel'in canlı siteyi otomatik olarak güncellediği doğrulandı.
